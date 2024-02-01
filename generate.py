@@ -1,38 +1,37 @@
 import csv
 from eightpuzzle import createRandomEightPuzzle
 
-def generate_configurations(num_configurations, moves_per_configuration):
-    """
-    Generate random configurations for the 8-puzzle.
-    Each configuration is represented as a list of integers.
-    """
-    configurations = []
-    for _ in range(num_configurations):
-        puzzle = createRandomEightPuzzle(moves=moves_per_configuration)
-        configuration = [cell for row in puzzle.cells for cell in row]
+def generate_scenarios(num_scenarios, csv_filename):
+    scenarios = []
 
-        # Ensure that the configuration has exactly 9 numbers
-        if len(configuration) != 9:
-            raise ValueError("Invalid configuration: not enough numbers.")
+    for i in range(num_scenarios):
+        # Generate a random 8-puzzle state
+        puzzle = createRandomEightPuzzle()
+        initial_state = [cell for row in puzzle.cells for cell in row]
 
-        configurations.append(configuration)
+        # Create a scenario name (you can customize this)
+        scenario_name = f'Scenario_{i + 1}'
 
-    return configurations
+        scenarios.append({
+            'name': scenario_name,
+            'initial_state': ','.join(map(str, initial_state)),
+        })
 
-def write_to_csv(file_path, configurations):
-    """
-    Write configurations to a CSV file.
-    """
-    with open(file_path, 'w', newline='') as csvfile:
-        writer = csv.writer(csvfile)
-        for config in configurations:
-            writer.writerow(config)
+    # Save scenarios to CSV
+    fieldnames = ['name', 'initial_state']
+    with open(csv_filename, mode='w', newline='') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(scenarios)
+
+    print(f'{num_scenarios} scenarios generated and saved to {csv_filename}.')
 
 if __name__ == '__main__':
-    num_configurations = 100
-    moves_per_configuration = 25
-    output_file_path = 'scenarios.csv'
+    # Specify the number of scenarios to generate
+    num_scenarios = 10
 
-    configurations = generate_configurations(num_configurations, moves_per_configuration)
-    write_to_csv(output_file_path, configurations)
-    print(f'{num_configurations} configurations written to {output_file_path}')
+    # Specify the CSV file to save scenarios
+    csv_filename = 'scenarios.csv'
+
+    # Generate scenarios and save them to CSV
+    generate_scenarios(num_scenarios, csv_filename)
